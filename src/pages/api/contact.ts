@@ -2,6 +2,7 @@ import sgMail from '@sendgrid/mail';
 import {NextApiRequest, NextApiResponse} from 'next';
 
 // Contact form API route - handles form submissions via SendGrid
+// Redeploy trigger
 
 if (process.env.SENDGRID_API_KEY) {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
