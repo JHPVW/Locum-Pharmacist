@@ -17,6 +17,8 @@ const ContactForm: FC = memo(() => {
   );
 
   const [data, setData] = useState<FormData>(defaultData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
 
   const onChange = useCallback(
     <T extends HTMLInputElement | HTMLTextAreaElement>(event: React.ChangeEvent<T>): void => {
@@ -32,13 +34,32 @@ const ContactForm: FC = memo(() => {
   const handleSendMessage = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      /**
-       * This is a good starting point to wire up your form submission logic
-       * TODO: Add API route to handle form submission
-       * */
-      // Form submission logic will be added here
+      setIsSubmitting(true);
+      setSubmitStatus(null);
+
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          setSubmitStatus('success');
+          setData(defaultData);
+        } else {
+          setSubmitStatus('error');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        setSubmitStatus('error');
+      } finally {
+        setIsSubmitting(false);
+      }
     },
-    [],
+    [data, defaultData],
   );
 
   const inputClasses =
@@ -67,10 +88,17 @@ const ContactForm: FC = memo(() => {
       />
       <button
         aria-label="Submit contact form"
-        className="w-max rounded-full border-2 border-orange-600 bg-stone-900 px-4 py-2 text-sm font-medium text-white shadow-md outline-none hover:bg-stone-800 focus:ring-2 focus:ring-orange-600 focus:ring-offset-2 focus:ring-offset-stone-800"
-        type="submit">
-        Send Message
+        className="w-max rounded-full border-2 border-orange-600 bg-stone-900 px-4 py-2 text-sm font-medium text-white shadow-md outline-none hover:bg-stone-800 focus:ring-2 focus:ring-orange-600 focus:ring-offset-2 focus:ring-offset-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
+        type="submit"
+        disabled={isSubmitting}>
+        {isSubmitting ? 'Sending...' : 'Send Message'}
       </button>
+      {submitStatus === 'success' && (
+        <p className="text-sm text-green-400">Message sent successfully! I'll be in touch soon.</p>
+      )}
+      {submitStatus === 'error' && (
+        <p className="text-sm text-red-400">Failed to send message. Please try again or email directly.</p>
+      )}
     </form>
   );
 });
