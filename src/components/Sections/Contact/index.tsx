@@ -10,7 +10,7 @@ import InstagramIcon from '../../Icon/InstagramIcon';
 import LinkedInIcon from '../../Icon/LinkedInIcon';
 import TwitterIcon from '../../Icon/TwitterIcon';
 import Section from '../../Layout/Section';
-import CalendlyWidget from './CalendlyWidget';
+import ContactForm from './ContactForm';
 
 const ContactValueMap: Record<ContactType, ContactValue> = {
   [ContactType.Email]: {Icon: EnvelopeIcon, srLabel: 'Email'},
@@ -24,7 +24,7 @@ const ContactValueMap: Record<ContactType, ContactValue> = {
 };
 
 const Contact: FC = memo(() => {
-  const {headerText, description, items, calendlyUrl} = contact;
+  const {headerText, description, items} = contact;
   return (
     <Section className="bg-neutral-800" sectionId={SectionId.Contact}>
       <div className="flex flex-col gap-y-6">
@@ -34,11 +34,7 @@ const Contact: FC = memo(() => {
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="order-2 col-span-1 md:order-1 ">
-            {calendlyUrl ? (
-              <CalendlyWidget url={calendlyUrl} />
-            ) : (
-              <p className="text-neutral-300">Please configure your Calendly URL in the data file.</p>
-            )}
+            <ContactForm />
           </div>
           <div className="order-1 col-span-1 flex flex-col gap-y-4 md:order-2">
             <p className="prose leading-6 text-neutral-300">{description}</p>
