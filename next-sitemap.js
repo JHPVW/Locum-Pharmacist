@@ -1,6 +1,6 @@
 /* eslint-env node */
 module.exports = {
-  siteUrl: 'reactresume.com',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://locumpharmacistmelbourne.com.au',
   exclude: ['/404*', '/500*'],
   transform: async (config, path) => {
     return {

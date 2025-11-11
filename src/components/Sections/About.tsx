@@ -27,7 +27,7 @@ const About: FC = memo(() => {
               <li className="col-span-1 flex  items-start gap-x-2" key={idx}>
                 {Icon && <Icon className="h-5 w-5 text-white" />}
                 <span className="text-sm font-bold text-white">{label}:</span>
-                <span className=" text-sm text-gray-300">{text}</span>
+                <span className="text-sm text-gray-300 whitespace-pre-line">{text}</span>
               </li>
             ))}
           </ul>

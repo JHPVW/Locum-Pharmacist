@@ -114,6 +114,7 @@ export interface ContactSection {
   headerText?: string;
   description: string;
   items: ContactItem[];
+  calendlyUrl?: string;
 }
 
 export const ContactType = {

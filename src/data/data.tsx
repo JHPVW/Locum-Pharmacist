@@ -1,6 +1,5 @@
 import {
   AcademicCapIcon,
-  ArrowDownTrayIcon,
   BuildingOffice2Icon,
   CalendarIcon,
   FlagIcon,
@@ -8,23 +7,7 @@ import {
   SparklesIcon,
 } from '@heroicons/react/24/outline';
 
-import GithubIcon from '../components/Icon/GithubIcon';
-import InstagramIcon from '../components/Icon/InstagramIcon';
-import LinkedInIcon from '../components/Icon/LinkedInIcon';
-import StackOverflowIcon from '../components/Icon/StackOverflowIcon';
-import TwitterIcon from '../components/Icon/TwitterIcon';
 import heroImage from '../images/header-background.webp';
-import porfolioImage1 from '../images/portfolio/portfolio-1.jpg';
-import porfolioImage2 from '../images/portfolio/portfolio-2.jpg';
-import porfolioImage3 from '../images/portfolio/portfolio-3.jpg';
-import porfolioImage4 from '../images/portfolio/portfolio-4.jpg';
-import porfolioImage5 from '../images/portfolio/portfolio-5.jpg';
-import porfolioImage6 from '../images/portfolio/portfolio-6.jpg';
-import porfolioImage7 from '../images/portfolio/portfolio-7.jpg';
-import porfolioImage8 from '../images/portfolio/portfolio-8.jpg';
-import porfolioImage9 from '../images/portfolio/portfolio-9.jpg';
-import porfolioImage10 from '../images/portfolio/portfolio-10.jpg';
-import porfolioImage11 from '../images/portfolio/portfolio-11.jpg';
 import profilepic from '../images/profilepic.jpg';
 import testimonialImage from '../images/testimonial.webp';
 import {
@@ -44,8 +27,8 @@ import {
  * Page meta data
  */
 export const homePageMeta: HomepageMeta = {
-  title: 'React Resume Template',
-  description: "Example site built with Tim Baker's react resume template",
+  title: 'LocumPharmacistMelbourne.com.au',
+  description: 'Reliable, experienced pharmacist locum services across Melbourne, Victoria.',
 };
 
 /**
@@ -69,32 +52,25 @@ export type SectionId = (typeof SectionId)[keyof typeof SectionId];
  */
 export const heroData: Hero = {
   imageSrc: heroImage,
-  name: `I'm Tim Baker.`,
+  name: `Locum Pharmacist — Melbourne, Victoria`,
   description: (
     <>
       <p className="prose-sm text-stone-200 sm:prose-base lg:prose-lg">
-        I'm a Victoria based <strong className="text-stone-100">Full Stack Software Engineer</strong>, currently working
-        at <strong className="text-stone-100">Instant Domains</strong> helping build a modern, mobile-first, domain
-        registrar and site builder.
+        I'm a registered community pharmacist providing professional{' '}
+        <strong className="text-stone-100">locum cover across Melbourne</strong> and regional Victoria. I ensure
+        continuity of care, PBS compliance, and smooth dispensary operations during staff absences and peak periods.
       </p>
       <p className="prose-sm text-stone-200 sm:prose-base lg:prose-lg">
-        In my free time time, you can catch me training in <strong className="text-stone-100">Muay Thai</strong>,
-        plucking my <strong className="text-stone-100">banjo</strong>, or exploring beautiful{' '}
-        <strong className="text-stone-100">Vancouver Island</strong>.
+        Experienced across independent and franchise pharmacies, including high-volume environments. Competent with{' '}
+        <strong className="text-stone-100">DispenseWorks, Minfos, Fred, POSWorks, Fred Plus, Z dispense, DDcloud, MethDA, and StrongRoom</strong>.
       </p>
     </>
   ),
   actions: [
     {
-      href: '/assets/resume.pdf',
-      text: 'Resume',
-      primary: true,
-      Icon: ArrowDownTrayIcon,
-    },
-    {
       href: `#${SectionId.Contact}`,
-      text: 'Contact',
-      primary: false,
+      text: 'Enquire / Book',
+      primary: true,
     },
   ],
 };
@@ -104,16 +80,21 @@ export const heroData: Hero = {
  */
 export const aboutData: About = {
   profileImageSrc: profilepic,
-  description: `Use this bio section as your way of describing yourself and saying what you do, what technologies you like
-  to use or feel most comfortable with, describing your personality, or whatever else you feel like throwing
-  in.`,
+  description:
+    'Registered community pharmacist based in Melbourne, Victoria. I specialise in maintaining accurate, compliant, and efficient dispensary operations with a calm, team-focused approach. Services include MedsChecks (incl. Diabetes MedsCheck), DAAs, vaccinations, clinical screening/counselling, and PPA-funded programs. I integrate quickly with new teams and systems to keep workflows running smoothly.',
   aboutItems: [
-    {label: 'Location', text: 'Victoria, BC', Icon: MapIcon},
-    {label: 'Age', text: '29', Icon: CalendarIcon},
-    {label: 'Nationality', text: 'Canadian / Irish', Icon: FlagIcon},
-    {label: 'Interests', text: 'Motorcycles, Muay Thai, Banjos', Icon: SparklesIcon},
-    {label: 'Study', text: 'University of Victoria', Icon: AcademicCapIcon},
-    {label: 'Employment', text: 'Instant Domains, inc.', Icon: BuildingOffice2Icon},
+    {label: 'Location', text: 'Elsternwick 3185, Melbourne, VIC', Icon: MapIcon},
+    {
+      label: 'Service Regions',
+      text: 'All directions welcome: CBD & Inner Suburbs; West (Melton, Rockbank, Thornhill Park, Werribee, Point Cook); North/East (Doncaster, Ringwood, Heidelberg, Greensborough, and surrounding areas).\nRegional by request.',
+      Icon: MapIcon,
+    },
+    {label: 'Availability', text: 'Available weekdays with flexible hours. Weekends unavailable.', Icon: CalendarIcon},
+    {label: 'Systems', text: 'DispenseWorks, Minfos, Fred, POSWorks, Fred Plus, Z Dispense, DDBook, MethDA, Strongroom, MyPak, Medadvisor', Icon: SparklesIcon},
+    {label: 'Vaccinations', text: 'Flu, COVID-19, Whooping Cough, RSV, Travel Health', Icon: AcademicCapIcon},
+    {label: 'AHPRA', text: 'PHA0002760177', Icon: FlagIcon},
+    {label: 'ABN', text: '60 941 806 254', Icon: BuildingOffice2Icon},
+    {label: 'Insurance', text: 'Professional indemnity (current)', Icon: SparklesIcon},
   ],
 };
 
@@ -122,71 +103,32 @@ export const aboutData: About = {
  */
 export const skills: SkillGroup[] = [
   {
-    name: 'Spoken languages',
+    name: 'Core Competencies',
     skills: [
-      {
-        name: 'English',
-        level: 10,
-      },
-      {
-        name: 'French',
-        level: 4,
-      },
-      {
-        name: 'Spanish',
-        level: 3,
-      },
+      {name: 'PBS dispensing & claiming', level: 9},
+      {name: 'PBS reconciliation & compliance', level: 9},
+      {name: 'Workflow optimisation', level: 8},
+      {name: 'Team leadership & supervision', level: 8},
+      {name: 'Clinical screening & counselling', level: 8},
     ],
   },
   {
-    name: 'Frontend development',
+    name: 'Professional Services',
     skills: [
-      {
-        name: 'React',
-        level: 9,
-      },
-      {
-        name: 'Typescript',
-        level: 7,
-      },
-      {
-        name: 'GraphQL',
-        level: 6,
-      },
+      {name: 'MedsCheck & Diabetes MedsCheck (PPA)', level: 9},
+      {name: 'Vaccinations (flu, COVID-19, etc.)', level: 9},
+      {name: 'DAA / SureMed management', level: 8},
+      {name: 'DAA QA & continuity', level: 8},
+      {name: 'PPA-funded programs', level: 8},
     ],
   },
   {
-    name: 'Backend development',
+    name: 'Systems & Tools',
     skills: [
-      {
-        name: 'Node.js',
-        level: 8,
-      },
-      {
-        name: 'Rust',
-        level: 5,
-      },
-      {
-        name: 'Golang',
-        level: 4,
-      },
-    ],
-  },
-  {
-    name: 'Mobile development',
-    skills: [
-      {
-        name: 'React Native',
-        level: 9,
-      },
-      {
-        name: 'Flutter',
-        level: 4,
-      },
-      {
-        name: 'Swift',
-        level: 3,
-      },
+      {name: 'DispenseWorks', level: 9},
+      {name: 'Minfos', level: 8},
+      {name: 'Fred', level: 8},
+      {name: 'POSWorks', level: 8},
     ],
   },
 ];
@@ -195,115 +137,15 @@ export const skills: SkillGroup[] = [
  * Portfolio section
  */
 export const portfolioItems: PortfolioItem[] = [
-  {
-    title: 'Project title 1',
-    description: 'Give a short description of your project here.',
-    url: 'https://reactresume.com',
-    image: porfolioImage1,
-  },
-  {
-    title: 'Project title 2',
-    description: 'Give a short description of your project here.',
-    url: 'https://reactresume.com',
-    image: porfolioImage2,
-  },
-  {
-    title: 'Project title 3',
-    description: 'Give a short description of your project here.',
-    url: 'https://reactresume.com',
-    image: porfolioImage3,
-  },
-  {
-    title: 'Project title 4',
-    description: 'Give a short description of your project here.',
-    url: 'https://reactresume.com',
-    image: porfolioImage4,
-  },
-  {
-    title: 'Project title 5',
-    description: 'Give a short description of your project here.',
-    url: 'https://reactresume.com',
-    image: porfolioImage5,
-  },
-  {
-    title: 'Project title 6',
-    description: 'Give a short description of your project here.',
-    url: 'https://reactresume.com',
-    image: porfolioImage6,
-  },
-  {
-    title: 'Project title 7',
-    description: 'Give a short description of your project here.',
-    url: 'https://reactresume.com',
-    image: porfolioImage7,
-  },
-  {
-    title: 'Project title 8',
-    description: 'Give a short description of your project here.',
-    url: 'https://reactresume.com',
-    image: porfolioImage8,
-  },
-  {
-    title: 'Project title 9',
-    description: 'Give a short description of your project here.',
-    url: 'https://reactresume.com',
-    image: porfolioImage9,
-  },
-  {
-    title: 'Project title 10',
-    description: 'Give a short description of your project here.',
-    url: 'https://reactresume.com',
-    image: porfolioImage10,
-  },
-  {
-    title: 'Project title 11',
-    description: 'Give a short description of your project here.',
-    url: 'https://reactresume.com',
-    image: porfolioImage11,
-  },
 ];
 
 /**
  * Resume section -- TODO: Standardize resume contact format or offer MDX
  */
 export const education: TimelineItem[] = [
-  {
-    date: 'April 2007',
-    location: 'Clown college',
-    title: 'Masters in Beer tasting',
-    content: <p>Describe your experience at school, what you learned, what useful skills you have acquired etc.</p>,
-  },
-  {
-    date: 'March 2003',
-    location: 'School of Business',
-    title: 'What did you study 101',
-    content: <p>Describe your experience at school, what you learned, what useful skills you have acquired etc.</p>,
-  },
 ];
 
 export const experience: TimelineItem[] = [
-  {
-    date: 'March 2010 - Present',
-    location: 'Awesome Development Company',
-    title: 'Senior UX Engineer',
-    content: (
-      <p>
-        Describe work, special projects, notable achievements, what technologies you have been working with, and
-        anything else that would be useful for an employer to know.
-      </p>
-    ),
-  },
-  {
-    date: 'March 2007 - February 2010',
-    location: 'Garage Startup Studio',
-    title: 'Junior bug fixer',
-    content: (
-      <p>
-        Describe work, special projects, notable achievements, what technologies you have been working with, and
-        anything else that would be useful for an employer to know.
-      </p>
-    ),
-  },
 ];
 
 /**
@@ -313,19 +155,16 @@ export const testimonial: TestimonialSection = {
   imageSrc: testimonialImage,
   testimonials: [
     {
-      name: 'John Doe',
-      text: 'Use this as an opportunity to promote what it is like to work with you. High value testimonials include ones from current or past co-workers, managers, or from happy clients.',
-      image: 'https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/169.jpg',
+      name: 'Pharmacy Owner, DCO Cheltenham',
+      text: 'Jordan has been a great support to our pharmacy team in a locum capacity. He consistently demonstrates strong communication skills and a genuine care for customers. He brings energy and professionalism to the role, and his approachable nature makes him a pleasure to work with.',
     },
     {
-      name: 'Jane Doe',
-      text: 'Here you should write some nice things that someone has said about you. Encourage them to be specific and include important details (notes about a project you were on together, impressive quality produced, etc).',
-      image: 'https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/14.jpg',
+      name: 'Pharmacy Owner, Western Suburbs',
+      text: 'Reliable, detail-oriented, and proactive — Jordan consistently ensures the dispensary runs smoothly and PBS claims are compliant.',
     },
     {
-      name: 'Someone else',
-      text: 'Add several of these, and keep them as fresh as possible, but be sure to focus on quality testimonials with strong highlights of your skills/work ethic.',
-      image: 'https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/69.jpg',
+      name: 'Dispensary Manager, Melbourne Metro',
+      text: 'Exceptional communication and teamwork. Quickly adapts to new systems and delivers excellent patient care.',
     },
   ],
 };
@@ -335,28 +174,20 @@ export const testimonial: TestimonialSection = {
  */
 
 export const contact: ContactSection = {
-  headerText: 'Get in touch.',
-  description: 'Here is a good spot for a message to your readers to let them know how best to reach out to you.',
+  headerText: 'Service Enquiries & Bookings',
+  description:
+    'For locum pharmacist cover across Melbourne and regional Victoria. Include pharmacy location, dates/times, dispense system, and any specific service requirements.',
+  calendlyUrl: 'https://calendly.com/your-username', // Update with your Calendly URL
   items: [
     {
       type: ContactType.Email,
-      text: 'reachout@timbaker.me',
-      href: 'mailto:reachout@timbaker.me',
+      text: 'contact@locumpharmacistmelbourne.com.au',
+      href: 'mailto:contact@locumpharmacistmelbourne.com.au',
     },
     {
       type: ContactType.Location,
-      text: 'Victoria BC, Canada',
-      href: 'https://www.google.ca/maps/place/Victoria,+BC/@48.4262362,-123.376775,14z',
-    },
-    {
-      type: ContactType.Instagram,
-      text: '@tbakerx',
-      href: 'https://www.instagram.com/tbakerx/',
-    },
-    {
-      type: ContactType.Github,
-      text: 'tbakerx',
-      href: 'https://github.com/tbakerx',
+      text: 'Melbourne, VIC',
+      href: 'https://maps.google.com/?q=Melbourne+VIC',
     },
   ],
 };
@@ -365,9 +196,4 @@ export const contact: ContactSection = {
  * Social items
  */
 export const socialLinks: Social[] = [
-  {label: 'Github', Icon: GithubIcon, href: 'https://github.com/tbakerx'},
-  {label: 'Stack Overflow', Icon: StackOverflowIcon, href: 'https://stackoverflow.com/users/8553186/tim-baker'},
-  {label: 'LinkedIn', Icon: LinkedInIcon, href: 'https://www.linkedin.com/in/timbakerx/'},
-  {label: 'Instagram', Icon: InstagramIcon, href: 'https://www.instagram.com/reactresume/'},
-  {label: 'Twitter', Icon: TwitterIcon, href: 'https://twitter.com/TimBakerx'},
 ];

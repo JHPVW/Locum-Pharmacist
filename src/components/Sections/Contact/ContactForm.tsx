@@ -34,8 +34,9 @@ const ContactForm: FC = memo(() => {
       event.preventDefault();
       /**
        * This is a good starting point to wire up your form submission logic
+       * TODO: Add API route to handle form submission
        * */
-      console.log('Data to send: ', data);
+      // Form submission logic will be added here
     },
     [data],
   );
