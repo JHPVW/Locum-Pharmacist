@@ -38,7 +38,7 @@ const ContactForm: FC = memo(() => {
        * */
       // Form submission logic will be added here
     },
-    [data],
+    [],
   );
 
   const inputClasses =

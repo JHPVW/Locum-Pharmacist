@@ -1,10 +1,10 @@
-import {FC, useEffect} from 'react';
+import {FC, memo, useEffect} from 'react';
 
 interface CalendlyWidgetProps {
   url: string;
 }
 
-const CalendlyWidget: FC<CalendlyWidgetProps> = ({url}) => {
+const CalendlyWidget: FC<CalendlyWidgetProps> = memo(({url}) => {
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://assets.calendly.com/assets/external/widget.js';
@@ -27,7 +27,8 @@ const CalendlyWidget: FC<CalendlyWidgetProps> = ({url}) => {
       style={{minWidth: '320px', height: '630px'}}
     />
   );
-};
+});
 
+CalendlyWidget.displayName = 'CalendlyWidget';
 export default CalendlyWidget;
 
