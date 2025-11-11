@@ -1,5 +1,5 @@
-import {NextApiRequest, NextApiResponse} from 'next';
 import sgMail from '@sendgrid/mail';
+import {NextApiRequest, NextApiResponse} from 'next';
 
 // Contact form API route - handles form submissions via SendGrid
 
