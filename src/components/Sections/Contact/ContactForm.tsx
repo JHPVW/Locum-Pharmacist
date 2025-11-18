@@ -6,6 +6,14 @@ interface FormData {
   message: string;
 }
 
+// Google Ads gtag type declaration
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
+  }
+}
+
 const ContactForm: FC = memo(() => {
   const defaultData = useMemo(
     () => ({
@@ -49,6 +57,13 @@ const ContactForm: FC = memo(() => {
         if (response.ok) {
           setSubmitStatus('success');
           setData(defaultData);
+          
+          // Track Google Ads conversion
+          if (typeof window !== 'undefined' && window.gtag) {
+            window.gtag('event', 'conversion', {
+              send_to: 'AW-17736898219/W3zfCMD3kMIbEKutzolC',
+            });
+          }
         } else {
           setSubmitStatus('error');
         }
