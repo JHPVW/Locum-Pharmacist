@@ -2,12 +2,12 @@ import {kv} from '@vercel/kv';
 import {NextApiRequest, NextApiResponse} from 'next';
 
 interface Lead {
+  [key: string]: unknown;
   id: string;
   submittedAt?: string;
   abandonedAt?: string;
   timestamp?: string;
   status?: string;
-  [key: string]: unknown;
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

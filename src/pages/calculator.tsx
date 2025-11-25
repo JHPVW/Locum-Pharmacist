@@ -1,17 +1,17 @@
-import {FC, memo, useCallback, useEffect, useState} from 'react';
 import {
-  ChevronRight,
+  Beaker,
+  CheckCircle,
   ChevronLeft,
+  ChevronRight,
+  DollarSign,
+  FileText,
   Mail,
   MapPin,
-  Users,
   Pill,
-  FileText,
-  Beaker,
   TrendingUp,
-  DollarSign,
-  CheckCircle,
+  Users,
 } from 'lucide-react';
+import {FC, memo, useCallback, useEffect, useState} from 'react';
 
 interface Suburb {
   name: string;
@@ -38,6 +38,39 @@ interface FormData {
   pharmacyName: string;
 }
 
+// Melbourne suburbs with approximate travel times
+const suburbs: Suburb[] = [
+  {name: 'Melbourne CBD', time: 0},
+  {name: 'Carlton', time: 10},
+  {name: 'Fitzroy', time: 12},
+  {name: 'Collingwood', time: 15},
+  {name: 'Richmond', time: 15},
+  {name: 'South Yarra', time: 18},
+  {name: 'St Kilda', time: 20},
+  {name: 'Brunswick', time: 20},
+  {name: 'Footscray', time: 25},
+  {name: 'Hawthorn', time: 22},
+  {name: 'Kew', time: 25},
+  {name: 'Preston', time: 28},
+  {name: 'Coburg', time: 25},
+  {name: 'Essendon', time: 28},
+  {name: 'Moonee Ponds', time: 25},
+  {name: 'Yarraville', time: 28},
+  {name: 'Williamstown', time: 32},
+  {name: 'Port Melbourne', time: 20},
+  {name: 'Albert Park', time: 18},
+  {name: 'Glen Waverley', time: 38},
+  {name: 'Box Hill', time: 35},
+  {name: 'Doncaster', time: 35},
+  {name: 'Camberwell', time: 25},
+  {name: 'Malvern', time: 22},
+  {name: 'Caulfield', time: 25},
+  {name: 'Bentleigh', time: 30},
+  {name: 'Brighton', time: 28},
+  {name: 'Sandringham', time: 35},
+  {name: 'Other (specify travel time)', time: null},
+].sort((a, b) => a.name.localeCompare(b.name));
+
 const PricingCalculator: FC = memo(() => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
@@ -58,39 +91,6 @@ const PricingCalculator: FC = memo(() => {
   const [rate, setRate] = useState(70);
   const [breakdown, setBreakdown] = useState<BreakdownItem[]>([]);
   const [submitted, setSubmitted] = useState(false);
-
-  // Melbourne suburbs with approximate travel times
-  const suburbs: Suburb[] = [
-    {name: 'Melbourne CBD', time: 0},
-    {name: 'Carlton', time: 10},
-    {name: 'Fitzroy', time: 12},
-    {name: 'Collingwood', time: 15},
-    {name: 'Richmond', time: 15},
-    {name: 'South Yarra', time: 18},
-    {name: 'St Kilda', time: 20},
-    {name: 'Brunswick', time: 20},
-    {name: 'Footscray', time: 25},
-    {name: 'Hawthorn', time: 22},
-    {name: 'Kew', time: 25},
-    {name: 'Preston', time: 28},
-    {name: 'Coburg', time: 25},
-    {name: 'Essendon', time: 28},
-    {name: 'Moonee Ponds', time: 25},
-    {name: 'Yarraville', time: 28},
-    {name: 'Williamstown', time: 32},
-    {name: 'Port Melbourne', time: 20},
-    {name: 'Albert Park', time: 18},
-    {name: 'Glen Waverley', time: 38},
-    {name: 'Box Hill', time: 35},
-    {name: 'Doncaster', time: 35},
-    {name: 'Camberwell', time: 25},
-    {name: 'Malvern', time: 22},
-    {name: 'Caulfield', time: 25},
-    {name: 'Bentleigh', time: 30},
-    {name: 'Brighton', time: 28},
-    {name: 'Sandringham', time: 35},
-    {name: 'Other (specify travel time)', time: null},
-  ].sort((a, b) => a.name.localeCompare(b.name));
 
   const calculateRate = useCallback(() => {
     let calculatedRate = 70; // Base rate
@@ -339,9 +339,9 @@ const PricingCalculator: FC = memo(() => {
               <h2 className="text-2xl font-bold text-gray-800 mb-2">Where is your pharmacy?</h2>
               <p className="text-gray-600 mb-6">This helps calculate travel time from Melbourne CBD</p>
               <select
-                value={formData.suburb}
+                className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
                 onChange={handleSuburbChange}
-                className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg">
+                value={formData.suburb}>
                 <option value="">Select suburb...</option>
                 {suburbs.map(suburb => (
                   <option key={suburb.name} value={suburb.name}>
@@ -355,18 +355,18 @@ const PricingCalculator: FC = memo(() => {
                     Travel time from Melbourne CBD (minutes)
                   </label>
                   <input
-                    type="number"
-                    min="0"
+                    className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
                     max="50"
-                    value={formData.travelTime}
+                    min="0"
                     onChange={e =>
                       setFormData({
                         ...formData,
                         travelTime: parseInt(e.target.value) || 0,
                       })
                     }
-                    className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
                     placeholder="Enter travel time"
+                    type="number"
+                    value={formData.travelTime}
                   />
                 </div>
               )}
@@ -380,13 +380,13 @@ const PricingCalculator: FC = memo(() => {
               <p className="text-gray-600 mb-6">Average daily prescription volume</p>
               <div className="mb-4">
                 <input
-                  type="range"
-                  min="0"
-                  max="300"
-                  step="10"
-                  value={formData.scriptsPerDay}
-                  onChange={e => setFormData({...formData, scriptsPerDay: parseInt(e.target.value)})}
                   className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  max="300"
+                  min="0"
+                  onChange={e => setFormData({...formData, scriptsPerDay: parseInt(e.target.value)})}
+                  step="10"
+                  type="range"
+                  value={formData.scriptsPerDay}
                 />
                 <div className="text-center mt-4">
                   <span className="text-5xl font-bold text-blue-600">{formData.scriptsPerDay}</span>
@@ -402,19 +402,19 @@ const PricingCalculator: FC = memo(() => {
               <h2 className="text-2xl font-bold text-gray-800 mb-2">Get your personalized rate</h2>
               <p className="text-gray-600 mb-6">Enter your email to continue and receive your quote summary</p>
               <input
-                type="email"
-                value={formData.email}
+                className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg mb-4"
                 onChange={e => setFormData({...formData, email: e.target.value})}
                 placeholder="pharmacy@example.com"
-                className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg mb-4"
                 required
+                type="email"
+                value={formData.email}
               />
               <input
-                type="text"
-                value={formData.pharmacyName}
+                className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
                 onChange={e => setFormData({...formData, pharmacyName: e.target.value})}
                 placeholder="Pharmacy name (optional)"
-                className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+                type="text"
+                value={formData.pharmacyName}
               />
             </div>
           )}
@@ -432,13 +432,13 @@ const PricingCalculator: FC = memo(() => {
                   {value: 'excellent', label: 'Excellent', desc: '2+ strong techs or tech + intern'},
                 ].map(option => (
                   <button
-                    key={option.value}
-                    onClick={() => setFormData({...formData, techQuality: option.value})}
                     className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
                       formData.techQuality === option.value
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-blue-300'
-                    }`}>
+                    }`}
+                    key={option.value}
+                    onClick={() => setFormData({...formData, techQuality: option.value})}>
                     <div className="font-semibold text-gray-800">{option.label}</div>
                     <div className="text-sm text-gray-600">{option.desc}</div>
                   </button>
@@ -459,13 +459,13 @@ const PricingCalculator: FC = memo(() => {
                   {value: 'high', label: 'More than 20 per day', desc: 'High OST volume'},
                 ].map(option => (
                   <button
-                    key={option.value}
-                    onClick={() => setFormData({...formData, ostVolume: option.value})}
                     className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
                       formData.ostVolume === option.value
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-blue-300'
-                    }`}>
+                    }`}
+                    key={option.value}
+                    onClick={() => setFormData({...formData, ostVolume: option.value})}>
                     <div className="font-semibold text-gray-800">{option.label}</div>
                     <div className="text-sm text-gray-600">{option.desc}</div>
                   </button>
@@ -486,13 +486,13 @@ const PricingCalculator: FC = memo(() => {
                   {value: 'complex', label: 'High Maintenance', desc: 'Frequent changes, complex regimens'},
                 ].map(option => (
                   <button
-                    key={option.value}
-                    onClick={() => setFormData({...formData, daaComplexity: option.value})}
                     className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
                       formData.daaComplexity === option.value
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-blue-300'
-                    }`}>
+                    }`}
+                    key={option.value}
+                    onClick={() => setFormData({...formData, daaComplexity: option.value})}>
                     <div className="font-semibold text-gray-800">{option.label}</div>
                     <div className="text-sm text-gray-600">{option.desc}</div>
                   </button>
@@ -513,13 +513,13 @@ const PricingCalculator: FC = memo(() => {
                   {value: 'complex', label: 'Complex Compounding', desc: 'Capsules, suspensions, complex formulations'},
                 ].map(option => (
                   <button
-                    key={option.value}
-                    onClick={() => setFormData({...formData, compounding: option.value})}
                     className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
                       formData.compounding === option.value
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-blue-300'
-                    }`}>
+                    }`}
+                    key={option.value}
+                    onClick={() => setFormData({...formData, compounding: option.value})}>
                     <div className="font-semibold text-gray-800">{option.label}</div>
                     <div className="text-sm text-gray-600">{option.desc}</div>
                   </button>
@@ -540,13 +540,13 @@ const PricingCalculator: FC = memo(() => {
                   {value: 'constant', label: 'Constantly Busy', desc: 'Sustained high workload all day'},
                 ].map(option => (
                   <button
-                    key={option.value}
-                    onClick={() => setFormData({...formData, workflowPattern: option.value})}
                     className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
                       formData.workflowPattern === option.value
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-blue-300'
-                    }`}>
+                    }`}
+                    key={option.value}
+                    onClick={() => setFormData({...formData, workflowPattern: option.value})}>
                     <div className="font-semibold text-gray-800">{option.label}</div>
                     <div className="text-sm text-gray-600">{option.desc}</div>
                   </button>
@@ -570,7 +570,7 @@ const PricingCalculator: FC = memo(() => {
                   <h3 className="font-semibold text-gray-800 mb-3">Rate Breakdown</h3>
                   <div className="space-y-2">
                     {breakdown.map((item, idx) => (
-                      <div key={idx} className="flex justify-between text-sm">
+                      <div className="flex justify-between text-sm" key={idx}>
                         <span className="text-gray-600">{item.label}</span>
                         <span
                           className={`font-semibold ${
@@ -589,20 +589,20 @@ const PricingCalculator: FC = memo(() => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number (optional)</label>
                   <input
-                    type="tel"
-                    value={formData.phone}
+                    className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
                     onChange={e => setFormData({...formData, phone: e.target.value})}
                     placeholder="0412 345 678"
-                    className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                    type="tel"
+                    value={formData.phone}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Contact Method</label>
                   <select
-                    value={formData.contactPreference}
+                    className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
                     onChange={e => setFormData({...formData, contactPreference: e.target.value})}
-                    className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none">
+                    value={formData.contactPreference}>
                     <option value="email">Email</option>
                     <option value="phone">Phone</option>
                     <option value="either">Either</option>
@@ -611,9 +611,9 @@ const PricingCalculator: FC = memo(() => {
               </div>
 
               <button
-                onClick={handleSubmit}
+                className="w-full mt-6 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold py-4 px-6 rounded-lg hover:from-blue-600 hover:to-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={!formData.email}
-                className="w-full mt-6 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold py-4 px-6 rounded-lg hover:from-blue-600 hover:to-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                onClick={handleSubmit}>
                 Submit Quote Request
               </button>
 
@@ -626,22 +626,16 @@ const PricingCalculator: FC = memo(() => {
           {/* Navigation */}
           <div className="flex justify-between mt-8">
             <button
-              onClick={() => setStep(Math.max(1, step - 1))}
+              className="flex items-center gap-2 px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               disabled={step === 1}
-              className="flex items-center gap-2 px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+              onClick={() => setStep(Math.max(1, step - 1))}>
               <ChevronLeft className="w-5 h-5" />
               Back
             </button>
 
             {step < 9 && (
               <button
-                onClick={() => {
-                  if (step === 3 && !formData.email) {
-                    alert('Please enter your email to continue');
-                    return;
-                  }
-                  setStep(step + 1);
-                }}
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-green-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 disabled={
                   (step === 1 && !formData.suburb) ||
                   (step === 3 && !formData.email) ||
@@ -651,7 +645,13 @@ const PricingCalculator: FC = memo(() => {
                   (step === 7 && !formData.compounding) ||
                   (step === 8 && !formData.workflowPattern)
                 }
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-green-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                onClick={() => {
+                  if (step === 3 && !formData.email) {
+                    alert('Please enter your email to continue');
+                    return;
+                  }
+                  setStep(step + 1);
+                }}>
                 Continue
                 <ChevronRight className="w-5 h-5" />
               </button>

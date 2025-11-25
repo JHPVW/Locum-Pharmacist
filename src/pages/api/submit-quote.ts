@@ -1,6 +1,6 @@
+import sgMail from '@sendgrid/mail';
 import {kv} from '@vercel/kv';
 import {NextApiRequest, NextApiResponse} from 'next';
-import sgMail from '@sendgrid/mail';
 
 if (process.env.SENDGRID_API_KEY) {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
