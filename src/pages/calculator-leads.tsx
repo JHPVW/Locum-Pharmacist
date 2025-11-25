@@ -1,5 +1,5 @@
 import {FC, memo, useCallback, useEffect, useState} from 'react';
-import {Download, Filter, Search, Lock, CheckCircle, XCircle} from 'lucide-react';
+import {Download, Search, Lock, CheckCircle, XCircle} from 'lucide-react';
 
 interface BreakdownItem {
   label: string;
@@ -75,12 +75,14 @@ const CalculatorLeads: FC = memo(() => {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchLeads();
-      // Refresh every 30 seconds
-      const interval = setInterval(fetchLeads, 30000);
-      return () => clearInterval(interval);
+    if (!isAuthenticated) {
+      return;
     }
+
+    fetchLeads();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchLeads, 30000);
+    return () => clearInterval(interval);
   }, [isAuthenticated, fetchLeads]);
 
   useEffect(() => {

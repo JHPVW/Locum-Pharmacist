@@ -205,28 +205,30 @@ const PricingCalculator: FC = memo(() => {
 
   // Capture abandoned lead when email is entered (debounced)
   useEffect(() => {
-    if (step === 3 && formData.email && !submitted) {
-      const timer = setTimeout(() => {
-        const abandonedData = {
-          ...formData,
-          rate,
-          breakdown,
-          abandonedAt: new Date().toISOString(),
-          status: 'abandoned',
-          abandonedStep: step,
-        };
-
-        fetch('/api/submit-quote', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(abandonedData),
-        }).catch(error => {
-          console.error('Error capturing abandoned lead:', error);
-        });
-      }, 2000); // Wait 2 seconds after email entry
-
-      return () => clearTimeout(timer);
+    if (!(step === 3 && formData.email && !submitted)) {
+      return;
     }
+
+    const timer = setTimeout(() => {
+      const abandonedData = {
+        ...formData,
+        rate,
+        breakdown,
+        abandonedAt: new Date().toISOString(),
+        status: 'abandoned',
+        abandonedStep: step,
+      };
+
+      fetch('/api/submit-quote', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(abandonedData),
+      }).catch(error => {
+        console.error('Error capturing abandoned lead:', error);
+      });
+    }, 2000); // Wait 2 seconds after email entry
+
+    return () => clearTimeout(timer);
   }, [formData.email, step, formData, rate, breakdown, submitted]);
 
   const handleSuburbChange = useCallback(
