@@ -37,7 +37,7 @@ const CalculatorLeads: FC = memo(() => {
   const [filter, setFilter] = useState<'all' | 'complete' | 'abandoned'>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const DASHBOARD_PASSWORD = 'locum2024';
+  const DASHBOARD_PASSWORD = 'LPMPL2025';
 
   const handleLogin = useCallback(() => {
     if (password === DASHBOARD_PASSWORD) {
