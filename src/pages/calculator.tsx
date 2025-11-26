@@ -3,12 +3,12 @@ import {
   CheckCircle,
   ChevronLeft,
   ChevronRight,
+  Clock,
   DollarSign,
   FileText,
   Mail,
   MapPin,
   Pill,
-  TrendingUp,
   Users,
 } from 'lucide-react';
 import {FC, memo, useCallback, useEffect, useState} from 'react';
@@ -21,6 +21,7 @@ interface Suburb {
 interface BreakdownItem {
   label: string;
   value: number;
+  isFlat?: boolean;
 }
 
 interface FormData {
@@ -31,12 +32,37 @@ interface FormData {
   ostVolume: string;
   daaComplexity: string;
   compounding: string;
-  workflowPattern: string;
   email: string;
   phone: string;
   contactPreference: string;
   pharmacyName: string;
+  shiftDate: string;
+  isPublicHoliday: boolean;
+  shortNotice: 'normal' | 'within24hrs';
+  shiftHours: string;
 }
+
+const VIC_PUBLIC_HOLIDAYS_2025 = [
+  '2025-01-01',
+  '2025-01-27',
+  '2025-03-10',
+  '2025-04-18',
+  '2025-04-19',
+  '2025-04-20',
+  '2025-04-21',
+  '2025-04-25',
+  '2025-06-09',
+  '2025-11-04',
+  '2025-12-25',
+  '2025-12-26',
+];
+
+const isPublicHoliday = (dateString: string) => {
+  if (!dateString) {
+    return false;
+  }
+  return VIC_PUBLIC_HOLIDAYS_2025.includes(dateString);
+};
 
 // Melbourne suburbs with approximate travel times
 const suburbs: Suburb[] = [
@@ -71,30 +97,46 @@ const suburbs: Suburb[] = [
   {name: 'Other (specify travel time)', time: null},
 ].sort((a, b) => a.name.localeCompare(b.name));
 
+const BASE_RATE = 70;
+const MIN_RATE = 65;
+const MAX_RATE = 110;
+const RATE_INCREMENT = 1.25;
+
+const formatCurrency = (value: number, options: {withSymbol?: boolean} = {}) => {
+  const {withSymbol = true} = options;
+  const formatted = value % 1 === 0 ? value.toFixed(0) : value.toFixed(2);
+  return withSymbol ? `$${formatted}` : formatted;
+};
+
+const defaultFormData: FormData = {
+  suburb: '',
+  travelTime: 0,
+  scriptsPerDay: 150,
+  techQuality: '',
+  ostVolume: '',
+  daaComplexity: '',
+  compounding: '',
+  email: '',
+  phone: '',
+  contactPreference: 'email',
+  pharmacyName: '',
+  shiftDate: '',
+  isPublicHoliday: false,
+  shortNotice: 'normal',
+  shiftHours: '',
+};
+
 const PricingCalculator: FC = memo(() => {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<FormData>({
-    suburb: '',
-    travelTime: 0,
-    scriptsPerDay: 150,
-    techQuality: '',
-    ostVolume: '',
-    daaComplexity: '',
-    compounding: '',
-    workflowPattern: '',
-    email: '',
-    phone: '',
-    contactPreference: 'email',
-    pharmacyName: '',
-  });
+  const [formData, setFormData] = useState<FormData>(defaultFormData);
 
-  const [rate, setRate] = useState(70);
-  const [breakdown, setBreakdown] = useState<BreakdownItem[]>([]);
+  const [rate, setRate] = useState(BASE_RATE);
+  const [breakdown, setBreakdown] = useState<BreakdownItem[]>([{label: 'Base Rate', value: BASE_RATE}]);
   const [submitted, setSubmitted] = useState(false);
 
   const calculateRate = useCallback(() => {
-    let calculatedRate = 70; // Base rate
-    const newBreakdown: BreakdownItem[] = [{label: 'Base Rate', value: 70}];
+    let calculatedRate = BASE_RATE;
+    const newBreakdown: BreakdownItem[] = [{label: 'Base Rate', value: BASE_RATE}];
 
     // Script count adjustment
     if (formData.scriptsPerDay < 120) {
@@ -107,7 +149,6 @@ const PricingCalculator: FC = memo(() => {
       calculatedRate += 15;
       newBreakdown.push({label: 'Very High Script Volume (250+)', value: 15});
     } else if (formData.scriptsPerDay >= 150 && formData.scriptsPerDay < 200) {
-      // Tech quality matters here
       if (formData.techQuality === 'poor') {
         calculatedRate += 15;
         newBreakdown.push({label: 'Scripts 150-200 with Poor Tech', value: 15});
@@ -158,15 +199,6 @@ const PricingCalculator: FC = memo(() => {
       newBreakdown.push({label: 'Complex Compounding', value: 10});
     }
 
-    // Workflow adjustment
-    if (formData.workflowPattern === 'waves') {
-      calculatedRate += 2;
-      newBreakdown.push({label: 'Busy in Waves', value: 2});
-    } else if (formData.workflowPattern === 'constant') {
-      calculatedRate += 10;
-      newBreakdown.push({label: 'Constantly Busy', value: 10});
-    }
-
     // Travel time adjustment
     if (formData.travelTime >= 25 && formData.travelTime < 35) {
       calculatedRate += 5;
@@ -174,15 +206,35 @@ const PricingCalculator: FC = memo(() => {
     } else if (formData.travelTime >= 35 && formData.travelTime < 45) {
       calculatedRate += 10;
       newBreakdown.push({label: 'Travel Time (35-45 min)', value: 10});
-    } else if (formData.travelTime >= 45 && formData.travelTime <= 50) {
-      calculatedRate += 15;
-      newBreakdown.push({label: 'Travel Time (45-50 min)', value: 15});
+    } else if (formData.travelTime >= 45 && formData.travelTime <= 55) {
+      calculatedRate += 12.5;
+      newBreakdown.push({label: 'Travel Time (45-55 min)', value: 12.5});
     }
 
-    // Clamp between 65 and 90
-    calculatedRate = Math.max(65, Math.min(90, calculatedRate));
+    calculatedRate = Math.max(MIN_RATE, Math.min(MAX_RATE, calculatedRate));
+    calculatedRate = Math.round(calculatedRate / RATE_INCREMENT) * RATE_INCREMENT;
 
-    setRate(calculatedRate);
+    if (formData.isPublicHoliday) {
+      const holidaySurcharge = Number((calculatedRate * 0.1).toFixed(2));
+      calculatedRate += holidaySurcharge;
+      newBreakdown.push({
+        label: 'Public Holiday Surcharge (10%)',
+        value: holidaySurcharge,
+      });
+    }
+
+    if (formData.shortNotice === 'within24hrs') {
+      newBreakdown.push({
+        label: 'Short Notice Fee (<24hrs) - Flat',
+        value: 30,
+        isFlat: true,
+      });
+    }
+
+    calculatedRate = Math.max(MIN_RATE, Math.min(MAX_RATE, calculatedRate));
+    calculatedRate = Math.round(calculatedRate / RATE_INCREMENT) * RATE_INCREMENT;
+
+    setRate(Number(calculatedRate.toFixed(2)));
     setBreakdown(newBreakdown);
   }, [formData]);
 
@@ -205,7 +257,7 @@ const PricingCalculator: FC = memo(() => {
 
   // Capture abandoned lead when email is entered (debounced)
   useEffect(() => {
-    if (!(step === 3 && formData.email && !submitted)) {
+    if (!(formData.email && !submitted)) {
       return;
     }
 
@@ -226,10 +278,10 @@ const PricingCalculator: FC = memo(() => {
       }).catch(error => {
         console.error('Error capturing abandoned lead:', error);
       });
-    }, 2000); // Wait 2 seconds after email entry
+    }, 2000);
 
     return () => clearTimeout(timer);
-  }, [formData.email, step, formData, rate, breakdown, submitted]);
+  }, [formData, rate, breakdown, step, submitted]);
 
   const handleSuburbChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -273,6 +325,17 @@ const PricingCalculator: FC = memo(() => {
     }
   }, [formData, rate, breakdown]);
 
+  const resetCalculator = useCallback(() => {
+    setFormData({...defaultFormData});
+    setStep(1);
+    setRate(BASE_RATE);
+    setBreakdown([{label: 'Base Rate', value: BASE_RATE}]);
+    setSubmitted(false);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('locum_calculator_progress');
+    }
+  }, []);
+
   const totalSteps = 9;
   const progress = (step / totalSteps) * 100;
 
@@ -293,6 +356,11 @@ const PricingCalculator: FC = memo(() => {
           <p className="text-sm text-gray-500">
             A copy has been sent to <strong>{formData.email}</strong>
           </p>
+          <button
+            className="mt-8 inline-flex items-center justify-center rounded-full border-2 border-blue-500 px-6 py-3 text-blue-600 font-semibold hover:bg-blue-50 transition"
+            onClick={resetCalculator}>
+            Run another calculation
+          </button>
         </div>
       </div>
     );
@@ -325,19 +393,46 @@ const PricingCalculator: FC = memo(() => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Current Estimated Rate</p>
-              <div className="text-4xl font-bold text-blue-600">${rate}/hr</div>
+              <div className="text-4xl font-bold text-blue-600">{formatCurrency(rate)}/hr</div>
             </div>
             <DollarSign className="w-16 h-16 text-blue-200" />
           </div>
         </div>
+        <p className="text-sm text-gray-600 mb-6 text-center">
+          Typical conditions: single pharmacist cover in metropolitan Melbourne, standard community dispensary workload, and
+          documented handover notes.
+        </p>
 
         {/* Question Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {step === 1 && (
             <div>
+              <Mail className="w-12 h-12 text-blue-500 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Let’s start with your details</h2>
+              <p className="text-gray-600 mb-6">I’ll send your custom summary directly to your inbox.</p>
+              <input
+                className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg mb-4"
+                onChange={e => setFormData({...formData, email: e.target.value})}
+                placeholder="pharmacy@example.com"
+                required
+                type="email"
+                value={formData.email}
+              />
+              <input
+                className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+                onChange={e => setFormData({...formData, pharmacyName: e.target.value})}
+                placeholder="Pharmacy name (optional)"
+                type="text"
+                value={formData.pharmacyName}
+              />
+            </div>
+          )}
+
+          {step === 2 && (
+            <div>
               <MapPin className="w-12 h-12 text-blue-500 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Where is your pharmacy?</h2>
-              <p className="text-gray-600 mb-6">This helps calculate travel time from Melbourne CBD</p>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Where and when is the shift?</h2>
+              <p className="text-gray-600 mb-6">Travel time and public holidays impact the hourly rate.</p>
               <select
                 className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
                 onChange={handleSuburbChange}
@@ -356,7 +451,7 @@ const PricingCalculator: FC = memo(() => {
                   </label>
                   <input
                     className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
-                    max="50"
+                    max="55"
                     min="0"
                     onChange={e =>
                       setFormData({
@@ -370,10 +465,66 @@ const PricingCalculator: FC = memo(() => {
                   />
                 </div>
               )}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Shift date</label>
+                <input
+                  className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      shiftDate: e.target.value,
+                      isPublicHoliday: isPublicHoliday(e.target.value),
+                    })
+                  }
+                  type="date"
+                  value={formData.shiftDate}
+                />
+                {formData.isPublicHoliday && (
+                  <div className="mt-2 bg-orange-50 border-l-4 border-orange-500 p-3 rounded">
+                    <p className="text-sm text-orange-800">
+                      ⚠️ <strong>Public Holiday Detected:</strong> 10% surcharge applies.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
-          {step === 2 && (
+          {step === 3 && (
+            <div>
+              <Clock className="w-12 h-12 text-blue-500 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">How soon do you need cover?</h2>
+              <p className="text-gray-600 mb-6">Shifts booked within 24 hours incur a flat $30 surcharge.</p>
+              <div className="space-y-3">
+                {[
+                  {
+                    value: 'normal',
+                    title: 'More than 24 hours away',
+                    description: 'Standard rate applies',
+                  },
+                  {
+                    value: 'within24hrs',
+                    title: 'Within 24 hours',
+                    description: 'Short notice fee applies (+$30 flat)',
+                  },
+                ].map(option => (
+                  <button
+                    className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                      formData.shortNotice === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+                    }`}
+                    key={option.value}
+                    onClick={() => setFormData({...formData, shortNotice: option.value as 'normal' | 'within24hrs'})}>
+                    <div className="font-semibold text-gray-800">{option.title}</div>
+                    <div className={`text-sm ${option.value === 'within24hrs' ? 'text-orange-600' : 'text-gray-600'}`}>
+                      {option.description}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === 4 && (
             <div>
               <FileText className="w-12 h-12 text-blue-500 mb-4" />
               <h2 className="text-2xl font-bold text-gray-800 mb-2">How many scripts per day?</h2>
@@ -396,30 +547,7 @@ const PricingCalculator: FC = memo(() => {
             </div>
           )}
 
-          {step === 3 && (
-            <div>
-              <Mail className="w-12 h-12 text-blue-500 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Get your personalized rate</h2>
-              <p className="text-gray-600 mb-6">Enter your email to continue and receive your quote summary</p>
-              <input
-                className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg mb-4"
-                onChange={e => setFormData({...formData, email: e.target.value})}
-                placeholder="pharmacy@example.com"
-                required
-                type="email"
-                value={formData.email}
-              />
-              <input
-                className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
-                onChange={e => setFormData({...formData, pharmacyName: e.target.value})}
-                placeholder="Pharmacy name (optional)"
-                type="text"
-                value={formData.pharmacyName}
-              />
-            </div>
-          )}
-
-          {step === 4 && (
+          {step === 5 && (
             <div>
               <Users className="w-12 h-12 text-blue-500 mb-4" />
               <h2 className="text-2xl font-bold text-gray-800 mb-2">Tech support quality?</h2>
@@ -447,7 +575,7 @@ const PricingCalculator: FC = memo(() => {
             </div>
           )}
 
-          {step === 5 && (
+          {step === 6 && (
             <div>
               <Pill className="w-12 h-12 text-blue-500 mb-4" />
               <h2 className="text-2xl font-bold text-gray-800 mb-2">OST volume?</h2>
@@ -474,7 +602,7 @@ const PricingCalculator: FC = memo(() => {
             </div>
           )}
 
-          {step === 6 && (
+          {step === 7 && (
             <div>
               <FileText className="w-12 h-12 text-blue-500 mb-4" />
               <h2 className="text-2xl font-bold text-gray-800 mb-2">DAA complexity?</h2>
@@ -501,7 +629,7 @@ const PricingCalculator: FC = memo(() => {
             </div>
           )}
 
-          {step === 7 && (
+          {step === 8 && (
             <div>
               <Beaker className="w-12 h-12 text-blue-500 mb-4" />
               <h2 className="text-2xl font-bold text-gray-800 mb-2">Compounding requirements?</h2>
@@ -528,33 +656,6 @@ const PricingCalculator: FC = memo(() => {
             </div>
           )}
 
-          {step === 8 && (
-            <div>
-              <TrendingUp className="w-12 h-12 text-blue-500 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Workflow pattern?</h2>
-              <p className="text-gray-600 mb-6">Typical daily workflow intensity</p>
-              <div className="space-y-3">
-                {[
-                  {value: 'moderate', label: 'Moderate/Wave-like', desc: 'Busy periods followed by quieter times'},
-                  {value: 'waves', label: 'Busy in Waves', desc: 'Multiple busy periods throughout the day'},
-                  {value: 'constant', label: 'Constantly Busy', desc: 'Sustained high workload all day'},
-                ].map(option => (
-                  <button
-                    className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-                      formData.workflowPattern === option.value
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-300'
-                    }`}
-                    key={option.value}
-                    onClick={() => setFormData({...formData, workflowPattern: option.value})}>
-                    <div className="font-semibold text-gray-800">{option.label}</div>
-                    <div className="text-sm text-gray-600">{option.desc}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           {step === 9 && (
             <div>
               <CheckCircle className="w-12 h-12 text-green-500 mb-4" />
@@ -563,7 +664,25 @@ const PricingCalculator: FC = memo(() => {
               <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6 mb-6">
                 <div className="text-center mb-4">
                   <div className="text-sm text-gray-600 mb-1">Estimated Hourly Rate</div>
-                  <div className="text-5xl font-bold text-blue-600">${rate}/hr</div>
+                  <div className="text-5xl font-bold text-blue-600">{formatCurrency(rate)}/hr</div>
+                  {formData.shiftHours && (
+                    <div className="mt-3 text-gray-700">
+                      <p className="text-sm text-gray-600">
+                        For a {formData.shiftHours} hour shift:
+                        <span className="font-semibold text-gray-900 ml-2">
+                          {formatCurrency(rate * Number(formData.shiftHours))}
+                        </span>
+                        {formData.shortNotice === 'within24hrs' && (
+                          <span className="ml-2">
+                            + $30 ={' '}
+                            <span className="font-semibold text-gray-900">
+                              {formatCurrency(rate * Number(formData.shiftHours) + 30)}
+                            </span>
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="border-t border-gray-300 pt-4">
@@ -576,8 +695,11 @@ const PricingCalculator: FC = memo(() => {
                           className={`font-semibold ${
                             item.value > 0 ? 'text-green-600' : item.value < 0 ? 'text-blue-600' : 'text-gray-800'
                           }`}>
-                          {item.value > 0 ? '+' : ''}
-                          {item.value === 0 ? '' : `$${item.value}`}
+                          {item.isFlat
+                            ? `+$${item.value}`
+                            : item.value === 0
+                              ? ''
+                              : `${item.value > 0 ? '+' : '-'}${formatCurrency(Math.abs(item.value))}`}
                         </span>
                       </div>
                     ))}
@@ -585,7 +707,32 @@ const PricingCalculator: FC = memo(() => {
                 </div>
               </div>
 
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 rounded">
+                <p className="text-sm text-yellow-800">
+                  💼 <strong>Note:</strong> This rate already includes GST and superannuation is not required as I operate as
+                  an independent contractor.
+                </p>
+              </div>
+
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded">
+                <p className="text-sm text-blue-800">
+                  📅 <strong>Booking multiple shifts?</strong> A 10% multi-shift discount applies to 3+ confirmed shifts (8+
+                  hours each). Mention it in your enquiry.
+                </p>
+              </div>
+
               <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Planned shift length (hours)</label>
+                  <input
+                    className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                    min="4"
+                    onChange={e => setFormData({...formData, shiftHours: e.target.value})}
+                    placeholder="e.g. 8"
+                    type="number"
+                    value={formData.shiftHours}
+                  />
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number (optional)</label>
                   <input
@@ -637,17 +784,20 @@ const PricingCalculator: FC = memo(() => {
               <button
                 className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-green-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 disabled={
-                  (step === 1 && !formData.suburb) ||
-                  (step === 3 && !formData.email) ||
-                  (step === 4 && !formData.techQuality) ||
-                  (step === 5 && !formData.ostVolume) ||
-                  (step === 6 && !formData.daaComplexity) ||
-                  (step === 7 && !formData.compounding) ||
-                  (step === 8 && !formData.workflowPattern)
+                  (step === 1 && !formData.email) ||
+                  (step === 2 && !formData.suburb) ||
+                  (step === 5 && !formData.techQuality) ||
+                  (step === 6 && !formData.ostVolume) ||
+                  (step === 7 && !formData.daaComplexity) ||
+                  (step === 8 && !formData.compounding)
                 }
                 onClick={() => {
-                  if (step === 3 && !formData.email) {
+                  if (step === 1 && !formData.email) {
                     alert('Please enter your email to continue');
+                    return;
+                  }
+                  if (step === 2 && !formData.suburb) {
+                    alert('Please select a suburb to continue');
                     return;
                   }
                   setStep(step + 1);
